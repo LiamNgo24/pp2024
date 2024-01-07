@@ -1,4 +1,8 @@
-import re
+# References
+# 1. Errors and exceptions  https://docs.python.org/3/tutorial/errors.html
+# 2. Formatted strings  https://docs.python.org/3/tutorial/inputoutput.html
+
+import re # https://docs.python.org/3/library/re.html
 
 def menu():
     print("\n--- Student Mark Management System ---")
