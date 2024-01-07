@@ -56,10 +56,28 @@ def input_student():
         students[id] = {'name': name, 'DoB': dob, 'marks': {}}
 
 def input_courses():
-    number = int(input("Enter the number of courses: "))
+    while True:
+        try:
+            number = int(input("Enter the number of courses: "))
+            break
+        except ValueError:
+            print("This value must be an integer. Please try again.")
+
     for _ in range(number):
-        id = input("\nEnter course ID: ")
-        name = input("Enter course name: ")
+        while True:
+            try:
+                id = int(input("\nEnter course ID: "))
+                break
+            except ValueError:
+                print("ID must be an integer. Please try again.")
+        
+        while True:
+            name = input("Enter course name: ")
+            if not name.isnumeric():
+                break
+            else:
+                print("Name cannot be a number. Please try again.")
+        
         courses[id] = name
 
 def input_marks(course_id):
