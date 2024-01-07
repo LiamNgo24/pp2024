@@ -19,14 +19,6 @@ def menu():
     print()
     return choice
 
-# def input_student():
-#     number = int(input("Enter the number of students: "))
-#     for _ in range(number):
-#         id = input("\nEnter student's ID: ")
-#         name = input("Enter student's name: ")
-#         dob = input("Enter student's date of birth (dd/mm/yyyy): ")
-#         students[id] = {'name': name, 'DoB': dob, 'marks': {}}
-
 def input_student():
     while True:
         try:
