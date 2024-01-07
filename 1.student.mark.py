@@ -1,3 +1,5 @@
+import re
+
 def menu():
     print("\n--- Student Mark Management System ---")
     print("1. Input number of students in a class")
@@ -13,12 +15,44 @@ def menu():
     print()
     return choice
 
+# def input_student():
+#     number = int(input("Enter the number of students: "))
+#     for _ in range(number):
+#         id = input("\nEnter student's ID: ")
+#         name = input("Enter student's name: ")
+#         dob = input("Enter student's date of birth (dd/mm/yyyy): ")
+#         students[id] = {'name': name, 'DoB': dob, 'marks': {}}
+
 def input_student():
-    number = int(input("Enter the number of students: "))
+    while True:
+        try:
+            number = int(input("Enter the number of students: "))
+            break
+        except ValueError:
+                print("This value must be an integer. Please try again.")
+    
     for _ in range(number):
-        id = input("\nEnter student's ID: ")
-        name = input("Enter student's name: ")
-        dob = input("Enter student's date of birth (dd/mm/yyyy): ")
+        while True:
+            try:
+                id = int(input("\nEnter student's ID: "))
+                break
+            except ValueError:
+                print("ID must be an integer. Please try again.")
+        
+        while True:
+            name = input("Enter student's name: ")
+            if not name.isnumeric():
+                break
+            else:
+                print("Name cannot be a number. Please try again.")
+        
+        while True:
+            dob = input("Enter student's date of birth (dd/mm/yyyy): ")
+            if re.match(r'^\d{2}/\d{2}/\d{4}$', dob):
+                break
+            else:
+                print("Invalid date format. Please use the format dd/mm/yyyy.")
+
         students[id] = {'name': name, 'DoB': dob, 'marks': {}}
 
 def input_courses():
@@ -89,6 +123,6 @@ def main():
             print("Exiting the program ... \n")
             break
         else:
-            print("Invalid choice. Try again.")
+            print("Invalid choice. Please try again.")
 
 main()
