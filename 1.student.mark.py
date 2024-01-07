@@ -16,7 +16,7 @@ def menu():
 def input_student():
     number = int(input("Enter the number of students: "))
     for _ in range(number):
-        id = input("Enter student's ID: ")
+        id = input("\nEnter student's ID: ")
         name = input("Enter student's name: ")
         dob = input("Enter student's date of birth (dd/mm/yyyy): ")
         students[id] = {'name': name, 'DoB': dob, 'marks': {}}
@@ -24,7 +24,7 @@ def input_student():
 def input_courses():
     number = int(input("Enter the number of courses: "))
     for _ in range(number):
-        id = input("Enter course ID: ")
+        id = input("\nEnter course ID: ")
         name = input("Enter course name: ")
         courses[id] = name
 
@@ -34,7 +34,7 @@ def input_marks(course_id):
         return
     for student_id in students:
         mark = float(input(f"Enter mark for student {student_id} ({students[student_id] ['name']}): "))
-        students[student_id] ['mark'] [course_id] = mark
+        students[student_id] ['marks'] [course_id] = mark
 
 def list_courses():
     if len(courses) == 0:
