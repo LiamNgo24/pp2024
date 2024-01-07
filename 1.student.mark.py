@@ -45,7 +45,7 @@ def list_courses():
     
 
 def list_students():
-    if len(courses) == 0:
+    if len(students) == 0:
         print("There are no students. Input information of a student first.")
     else: 
         for id, info in students.items():
