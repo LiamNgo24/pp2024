@@ -1,22 +1,39 @@
-# from msilib.schema import SelfReg
-# from typing import Self
 import re
-
 
 class Student:
     def __init__(self, student_id, name, dob):
-        self.student_id = student_id
-        self.name = name
-        self.dob = dob
-        self.marks = {}
+        self.__student_id = student_id
+        self.__name = name
+        self.__dob = dob
+        self.__marks = {}
 
     def add_mark(self, course_id, mark):
-        self.marks[course_id] = mark
+        self.__marks[course_id] = mark
+
+    # Getters
+    def get_student_id(self):
+        return self.__student_id
+
+    def get_name(self):
+        return self.__name
+
+    def get_dob(self):
+        return self.__dob
+
+    def get_marks(self, course_id):
+        return self.__marks.get(course_id, None)
 
 class Course:
     def __init__(self, course_id, name):
-        self.course_id = course_id
-        self.name = name
+        self.__course_id = course_id
+        self.__name = name
+
+    # Getters
+    def get_course_id(self):
+        return self.__course_id
+
+    def get_name(self):
+        return self.__name
 
 class ManagementSystem:
     def __init__(self):
@@ -58,33 +75,34 @@ class ManagementSystem:
         if course_id not in self.courses:
             print("Course not found.")
             return
-        for student_id in self.students:
-            mark = float(input(f"Enter mark for student {student_id} ({self.students[student_id].name}): "))
-            self.students[student_id].add_mark(course_id, mark)
+        for student_id, student in self.students.items():
+            mark = float(input(f"Enter mark for student {student_id} ({student.get_name()}): "))
+            student.add_mark(course_id, mark)
 
     def list_courses(self):
         if not self.courses:
             print("There are no courses. Input a course first.")
         else:
-            for course in self.courses.values():
-                print(f"{course.course_id}, {course.name}")
+            for course_id, course in self.courses.items():
+                print(f"Course ID: {course_id}, Name: {course.get_name()}")
 
     def list_students(self):
         if not self.students:
             print("There are no students. Input information of a student first.")
         else:
-            for student in self.students.values():
-                print(f"ID: {student.student_id}, Name: {student.name}, DoB: {student.dob}")
+            for student_id, student in self.students.items():
+                print(f"ID: {student_id}, Name: {student.get_name()}, DoB: {student.get_dob()}")
 
     def show_marks(self, course_id):
-        # course_id = self._get_integer_input("Enter course ID to list marks: ")
         if course_id not in self.courses:
             print("Course not found.")
             return
-        print(f"Marks for course {self.courses[course_id].name}:")
-        for student in self.students.values():
-            mark = student.marks.get(course_id, "N/A")
-            print(f"Student {student.student_id} ({student.name}): {mark}")
+        print(f"Marks for course {self.courses[course_id].get_name()}:")
+        for student_id, student in self.students.items():
+            mark = student.get_marks(course_id)
+            if mark is None:
+                mark = "N/A"
+            print(f"Student {student_id} ({student.get_name()}): {mark}")
 
     def _get_integer_input(self, prompt):
         while True:
