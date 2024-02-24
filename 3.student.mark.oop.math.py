@@ -1,7 +1,8 @@
 import re
 import math
-import numpy
+import numpy as np
 import curses
+from curses import wrapper
 
 class Student:
     def __init__(self, student_id, name, dob):
@@ -25,6 +26,14 @@ class Student:
 
     def get_marks(self, course_id):
         return self.__marks.get(course_id, None)
+    
+    def calculate_gpa(self):
+        if not self.__marks:
+            return 0  # No marks available
+        marks_array = np.array(list(self.__marks.values()))
+        # Assuming GPA is the average mark on a scale of 0-20
+        gpa = np.mean(marks_array)
+        return gpa
 
 class Course:
     def __init__(self, course_id, name):
@@ -53,7 +62,9 @@ class ManagementSystem:
         print("6. List courses")
         print("7. List students")
         print("8. Show student marks for a given course")
-        print("9. Exit")
+        print("9. Calculate and display student's GPA")
+        print("10. List GPA of students (sorted descending)")
+        print("0. Exit")
         choice = input("Enter your choice: ")
         print()
         return choice
@@ -130,6 +141,28 @@ class ManagementSystem:
             else:
                 print("Invalid date format. Please use the format dd/mm/yyyy.")
 
+    def print_student_gpa(self):
+        student_id = self._get_integer_input("Enter the student's ID to see GPA: ")
+        if student_id in self.students:
+            student = self.students[student_id]
+            gpa = student.calculate_gpa()
+            print(f"Student {student_id} ({student.get_name()}) has a GPA of: {gpa:.2f}")
+        else:
+            print("Student not found.")
+
+    def sort_students_by_gpa(self):
+            # Calculate GPA for all students and store in a list of tuples [(student_id, gpa), ...]
+            students_with_gpa = [(student_id, student.calculate_gpa()) for student_id, student in self.students.items()]
+            
+            # Sort the list of tuples by gpa in descending order
+            sorted_students_with_gpa = sorted(students_with_gpa, key=lambda x: x[1], reverse=True)
+            
+            # Now, use the sorted list to display the sorted students
+            print("Students sorted by GPA (descending):")
+            for student_id, gpa in sorted_students_with_gpa:
+                student = self.students[student_id]
+                print(f"ID: {student_id}, Name: {student.get_name()}, GPA: {gpa:.2f}")
+
 def main():
     system = ManagementSystem()
     while True:
@@ -148,10 +181,15 @@ def main():
             course_id = system._get_integer_input("Enter course ID to show marks: ")
             system.show_marks(course_id)
         elif choice == '9':
+            system.print_student_gpa()
+        elif choice == '10':
+            system.sort_students_by_gpa()
+        elif choice == '0':
             print("Exiting the program ... \n")
             break
         else:
             print("Invalid choice. Please try again.")
+
 
 if __name__ == "__main__":
     main()
