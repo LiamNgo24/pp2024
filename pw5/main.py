@@ -3,11 +3,32 @@ from unicodedata import name
 from domains.student import Student
 from domains.course import Course
 from input import *
+import os
+import pickle
+import gzip
 
 class ManagementSystem:
     def __init__(self):
         self.students = {}
         self.courses = {}
+        self.load_data()
+
+
+    def save_data(self):
+        with gzip.open('./data/students.dat', 'wb') as file:
+            data = {
+                'students': self.students,
+                'courses': self.courses,
+            }
+            pickle.dump(data, file)
+
+    def load_data(self):
+        if os.path.exists('./data/students.dat'):
+            with gzip.open('./data/students.dat', 'rb') as file:
+                data = pickle.load(file)
+                self.students = data['students']
+                self.courses = data['courses']
+
 
     def menu(self):
         print("\n--- Student Mark Management System ---")
@@ -36,6 +57,7 @@ class ManagementSystem:
                 dob = get_valid_date("Enter student's date of birth (dd/mm/yyyy): ")
                 self.students[student_id] = Student(student_id, name, dob)
                 student_file.write(f"{student_id},{name},{dob}\n")
+                self.save_data()
 
     def input_courses(self):
         number = get_integer_input("Enter the number of courses: ")
@@ -45,6 +67,7 @@ class ManagementSystem:
                 name = get_non_numeric_input("Enter course name: ")
                 self.courses[course_id] = Course(course_id, name)
                 courses_file.write(f"{course_id},{name}\n")
+                self.save_data()
 
     def input_marks(self):
         course_id = get_integer_input("Enter the course ID to input marks: ")
@@ -57,6 +80,7 @@ class ManagementSystem:
                 mark = float(input(f"Enter mark for student {student_id} ({student.get_name()}): "))
                 student.add_mark(course_id, math.floor(mark))
                 marks_file.write(f"{student_id},{course_name},{mark}\n")
+                self.save_data()
 
 
     def list_courses(self):

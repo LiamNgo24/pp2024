@@ -1,2 +1,0 @@
-370,<built-in function name>,20.0
-380,ADS,20.0
