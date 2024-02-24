@@ -163,7 +163,9 @@ class ManagementSystem:
                 student = self.students[student_id]
                 print(f"ID: {student_id}, Name: {student.get_name()}, GPA: {gpa:.2f}")
 
-def main():
+def main(stdscr):
+    stdscr.nodelay(False)
+
     system = ManagementSystem()
     while True:
         choice = system.menu()
@@ -190,6 +192,5 @@ def main():
         else:
             print("Invalid choice. Please try again.")
 
-
 if __name__ == "__main__":
-    main()
+    curses.wrapper(main)
