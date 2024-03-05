@@ -8,6 +8,7 @@ import pickle
 import gzip
 import threading
 import tkinter as tk
+from tkinter import ttk
 
 class ManagementSystem:
     def __init__(self):
@@ -166,6 +167,112 @@ def main():
             break
         else:
             print("Invalid choice. Please try again.")
+
+
+    def init_gui():
+        window = tk.Tk()
+        window.title("Student Information System")
+        window.geometry("800x600")
+        return window
+
+
+    def setup_ui(window, system):
+        # Tabs for different functionalities
+        tab_control = ttk.Notebook(window)
+        student_tab = ttk.Frame(tab_control)
+        course_tab = ttk.Frame(tab_control)
+        marks_tab = ttk.Frame(tab_control)
+        tab_control.add(student_tab, text='Students')
+        tab_control.add(course_tab, text='Courses')
+        tab_control.add(marks_tab, text='Marks')
+        tab_control.pack(expand=1, fill="both")
+        
+
+        # Student Tab: Organize with two frames, one for input, one for list
+        input_frame = ttk.Frame(student_tab)
+        input_frame.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
+        
+        # Student input fields in the input frame
+        ttk.Label(input_frame, text="Enter student details below:").grid(row=0, columnspan=2)
+
+        ttk.Label(input_frame, text="ID:").grid(row=1, column=0, sticky=tk.W, padx=5)
+        student_id_entry = ttk.Entry(input_frame)
+        student_id_entry.grid(row=1, column=1, sticky=tk.EW, padx=5)
+        
+        ttk.Label(input_frame, text="Name:").grid(row=2, column=0, sticky=tk.W, padx=5)
+        student_name_entry = ttk.Entry(input_frame)
+        student_name_entry.grid(row=2, column=1, sticky=tk.EW, padx=5)
+        
+        ttk.Label(input_frame, text="DoB:").grid(row=3, column=0, sticky=tk.W, padx=5)
+        student_dob_entry = ttk.Entry(input_frame)
+        student_dob_entry.grid(row=3, column=1, sticky=tk.EW, padx=5)
+        
+        # Make the entry widgets expand with the window
+        input_frame.columnconfigure(1, weight=1)
+        
+        # List Frame
+        list_frame = ttk.Frame(student_tab)
+        list_frame.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        ttk.Label(list_frame, text="Student List").pack(side=tk.TOP, fill=tk.X)
+        student_listbox = tk.Listbox(list_frame)
+        student_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar = ttk.Scrollbar(list_frame, orient='vertical', command=student_listbox.yview)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        student_listbox.config(yscrollcommand=scrollbar.set)
+        
+        for student_id, student in system.students.items():
+            student_listbox.insert(tk.END, f"ID: {student_id}, Name: {student.get_name()}, DoB: {student.get_dob()}")
+        
+        # Function to move focus to next field
+        def focus_next_widget(event):
+            event.widget.tk_focusNext().focus()
+            return("break")
+
+        # Function to add a student to the system and list
+        def add_student():
+            # Retrieve the input data
+            student_id = student_id_entry.get()
+            name = student_name_entry.get()
+            dob = student_dob_entry.get()
+
+            # Simple validation
+            if student_id and name and dob:
+                system.students[student_id] = Student(student_id, name, dob)
+                student_listbox.insert(tk.END, f"ID: {student_id}, Name: {name}, DoB: {dob}")
+
+                system.save_data()
+
+                # Clear the entry fields
+                student_id_entry.delete(0, tk.END)
+                student_name_entry.delete(0, tk.END)
+                student_dob_entry.delete(0, tk.END)
+
+                # Focus back to the first field
+                student_id_entry.focus_set()
+
+        # Bind the Return key to focus to next widget or add student
+        student_id_entry.bind("<Return>", focus_next_widget)
+        student_name_entry.bind("<Return>", focus_next_widget)
+        student_dob_entry.bind("<Return>", lambda event: add_student())
+
+        # Add button to add student
+        add_button = ttk.Button(input_frame, text="Add Student", command=add_student)
+        add_button.grid(row=4, columnspan=2, pady=5)
+
+
+        # Course Tab
+        ttk.Label(course_tab, text="Course List").pack()
+        course_listbox = tk.Listbox(course_tab)
+        course_listbox.pack(fill=tk.BOTH, expand=True)
+        for course_id, course in system.courses.items():
+            course_listbox.insert(tk.END, f"ID: {course_id}, Name: {course.get_name()}")
+
+
+    window = init_gui()
+    setup_ui(window, system)
+    window.mainloop()
+
 
 if __name__ == "__main__":
     main()
