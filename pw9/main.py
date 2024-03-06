@@ -1,5 +1,4 @@
 import math
-# from unicodedata import name
 from domains.student import Student
 from domains.course import Course
 from input import *
@@ -38,22 +37,22 @@ class ManagementSystem:
                 self.courses = data['courses']
 
 
-    def menu(self):
-        print("\n--- Student Mark Management System ---")
-        print("1. Input number of students in a class")
-        print("2. Input student information")
-        print("3. Input number of courses")
-        print("4. Input course information")
-        print("5. Select a course and input marks for students")
-        print("6. List courses")
-        print("7. List students")
-        print("8. Show student marks for a given course")
-        print("9. Calculate and display student's GPA")
-        print("10. List GPA of students (sorted descending)")
-        print("0. Exit")
-        choice = input("Enter your choice: ")
-        print()
-        return choice
+    # def menu(self):
+    #     print("\n--- Student Mark Management System ---")
+    #     print("1. Input number of students in a class")
+    #     print("2. Input student information")
+    #     print("3. Input number of courses")
+    #     print("4. Input course information")
+    #     print("5. Select a course and input marks for students")
+    #     print("6. List courses")
+    #     print("7. List students")
+    #     print("8. Show student marks for a given course")
+    #     print("9. Calculate and display student's GPA")
+    #     print("10. List GPA of students (sorted descending)")
+    #     print("0. Exit")
+    #     choice = input("Enter your choice: ")
+    #     print()
+    #     return choice
 
 
     def input_student(self):
@@ -170,11 +169,13 @@ def main():
     #         print("Invalid choice. Please try again.")
 
 
+    # Tkinter GUI (i hate this simple, old piece of garbage)
     def init_gui():
         window = tk.Tk()
         window.title("Student Information System")
         window.geometry("1200x750")
         window.minsize(800, 600)
+        window.iconbitmap("./family.ico")
         return window
 
 
@@ -402,6 +403,7 @@ def main():
             except ValueError as e:
                 print(f"Please enter valid numbers for course ID, student ID, and mark. Error: {e}")
 
+
         # Bind the Return key to focus to next widget
         student_id_mark_entry.bind("<Return>", focus_next_widget)
         course_id_mark_entry.bind("<Return>", focus_next_widget)
@@ -410,31 +412,44 @@ def main():
         add_mark_button = ttk.Button(marks_input_frame, text="Add Mark", command=add_mark)
         add_mark_button.grid(row=1, column=7, columnspan=1, pady=5)
 
+
         # The Table Frame
         marks_table_frame = ttk.Frame(marks_tab)
         marks_table_frame.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True, padx=5, pady=5)
 
-        # Define the table
-        columns = ('student_id',) + tuple(system.courses.keys())
-        marks_table = ttk.Treeview(marks_table_frame, columns=columns, show='headings')
+        # Vertical Scrollbar for the table
+        scrollbar = ttk.Scrollbar(marks_table_frame, orient='vertical')
+        scrollbar.pack(side='right', fill='y')
 
-        # Define the columns
-        marks_table.heading('student_id', text='Students')
+        # Horizontal Scrollbar for the table
+        scrollbar_horizontal = ttk.Scrollbar(marks_table_frame, orient='horizontal')
+        scrollbar_horizontal.pack(side='bottom', fill='x')
+
+        # Define the columns for the table
+        columns = ('student_info',) + tuple(system.courses.keys())
+        marks_table = ttk.Treeview(marks_table_frame, columns=columns, show='headings', yscrollcommand=scrollbar.set, xscrollcommand=scrollbar_horizontal.set)
+
+        # Configure the vertical scrollbar
+        scrollbar.config(command=marks_table.yview)
+
+        # Configure the horizontal scrollbar
+        scrollbar_horizontal.config(command=marks_table.xview)
+
+        # Define the columns and headings (Courses columns)
+        marks_table.heading('student_info', text='Student ID - Name')
         for course_id in system.courses.keys():
+            # Adjust column width and define headings
+            marks_table.column(course_id, width=150 , anchor='center')
             marks_table.heading(course_id, text=f"{course_id} - {system.courses[course_id].get_name()}")
 
         # Insert data into the table
         for student_id, student in system.students.items():
+            # Create a row with student info and marks for each course
             row = [f"{student_id} - {student.get_name()}"] + [student.get_marks(course_id) for course_id in system.courses.keys()]
             marks_table.insert('', tk.END, values=row)
 
         # Pack the table into the frame
-        marks_table.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-
-        # Scrollbar for the table
-        scrollbar = ttk.Scrollbar(marks_table_frame, orient=tk.VERTICAL, command=marks_table.yview)
-        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        marks_table.configure(yscrollcommand=scrollbar.set)
+        marks_table.pack(side='left', fill='both', expand=True)
 
 
 
