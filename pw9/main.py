@@ -1,5 +1,5 @@
 import math
-from unicodedata import name
+# from unicodedata import name
 from domains.student import Student
 from domains.course import Course
 from input import *
@@ -139,40 +139,42 @@ class ManagementSystem:
 
 def main():
     system = ManagementSystem()
-    while True:
-        choice = system.menu()
-        if choice == '1':
-            system.input_student()
-        elif choice == '2':
-            system.input_student()
-        elif choice == '3':
-            system.input_courses()
-        elif choice == '4':
-            system.input_courses()
-        elif choice == '5':
-            system.input_marks()
-        elif choice == '6':
-            system.list_courses()
-        elif choice == '7':
-            system.list_students()
-        elif choice == '8':
-            course_id = get_integer_input("Enter course ID to show marks: ")
-            system.show_marks(course_id)
-        elif choice == '9':
-            system.print_student_gpa()
-        elif choice == '10':
-            system.sort_students_by_gpa()
-        elif choice == '0':
-            print("Exiting the program ... \n")
-            break
-        else:
-            print("Invalid choice. Please try again.")
+
+    # while True:
+    #     choice = system.menu()
+    #     if choice == '1':
+    #         system.input_student()
+    #     elif choice == '2':
+    #         system.input_student()
+    #     elif choice == '3':
+    #         system.input_courses()
+    #     elif choice == '4':
+    #         system.input_courses()
+    #     elif choice == '5':
+    #         system.input_marks()
+    #     elif choice == '6':
+    #         system.list_courses()
+    #     elif choice == '7':
+    #         system.list_students()
+    #     elif choice == '8':
+    #         course_id = get_integer_input("Enter course ID to show marks: ")
+    #         system.show_marks(course_id)
+    #     elif choice == '9':
+    #         system.print_student_gpa()
+    #     elif choice == '10':
+    #         system.sort_students_by_gpa()
+    #     elif choice == '0':
+    #         print("Exiting the program ... \n")
+    #         break
+    #     else:
+    #         print("Invalid choice. Please try again.")
 
 
     def init_gui():
         window = tk.Tk()
         window.title("Student Information System")
-        window.geometry("800x600")
+        window.geometry("1200x750")
+        window.minsize(800, 600)
         return window
 
 
@@ -187,6 +189,8 @@ def main():
         tab_control.add(marks_tab, text='Marks')
         tab_control.pack(expand=1, fill="both")
         
+
+
 
         # Student Tab: Organize with two frames, one for input, one for list
         input_frame = ttk.Frame(student_tab)
@@ -261,10 +265,6 @@ def main():
         add_button.grid(row=4, columnspan=2, pady=5)
 
 
-        # # Course Tab
-        # ttk.Label(course_tab, text="Course List").pack()
-        # course_listbox = tk.Listbox(course_tab)
-        # course_listbox.pack(fill=tk.BOTH, expand=True)
         
 
         # Course Tab: Organize with two frames, one for input, one for list
@@ -331,6 +331,112 @@ def main():
         # Add button to add course
         add_course_button = ttk.Button(course_input_frame, text="Add Course", command=add_course)
         add_course_button.grid(row=3, columnspan=2, pady=5)
+
+
+
+
+        # Marks Tab: Organize with two frames, one for input, one for the table
+        marks_input_frame = ttk.Frame(marks_tab)
+        marks_input_frame.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
+        
+        # Marks input fields in the input frame
+        ttk.Label(marks_input_frame, text="Enter mark details below:").grid(row=0, columnspan=2)
+
+        ttk.Label(marks_input_frame, text="Course ID:").grid(row=1, column=0, sticky=tk.W, padx=5)
+        course_id_mark_entry = ttk.Entry(marks_input_frame)
+        course_id_mark_entry.grid(row=1, column=1, sticky=tk.EW, padx=5)
+
+        ttk.Label(marks_input_frame, text="Student ID:").grid(row=1, column=2, sticky=tk.W, padx=5)
+        student_id_mark_entry = ttk.Entry(marks_input_frame)
+        student_id_mark_entry.grid(row=1, column=3, sticky=tk.EW, padx=5)
+
+        ttk.Label(marks_input_frame, text="Mark:").grid(row=1, column=4, sticky=tk.W, padx=5)
+        mark_entry = ttk.Entry(marks_input_frame)
+        mark_entry.grid(row=1, column=5, sticky=tk.EW, padx=5)
+
+
+        def update_marks_table():
+            # Clear the table
+            for i in marks_table.get_children():
+                marks_table.delete(i)
+            # Re-populate the table with updated data
+            for student_id, student in system.students.items():
+                row = [f"{student_id} - {student.get_name()}"] + \
+                    [student.get_marks(course_id) if student.get_marks(course_id) is not None else 'None' 
+                    for course_id in system.courses.keys()]
+                marks_table.insert('', tk.END, values=row)
+
+
+        # Function to add a mark to the system and update the table
+        def add_mark():
+            # Retrieve the input data
+            course_id = course_id_mark_entry.get()
+            student_id = student_id_mark_entry.get()
+            mark = mark_entry.get()
+
+            # Simple validation and update
+            try:
+                course_id_int = int(course_id)
+                mark_float = float(mark)
+
+                print(f"Course ID entered: {course_id_int}")  # Debug print
+                print(f"Student ID entered: {student_id}")  # Debug print
+
+                if course_id_int in system.courses and student_id in system.students:
+                    # If the student ID needs to be an integer in other parts of your application, convert it here:
+                    # system.students[int(student_id)].add_mark(course_id_int, mark_float)
+                    system.students[student_id].add_mark(course_id_int, mark_float)
+                    system.save_data()
+                    # Update the table here if necessary
+                    print("Mark added successfully")  # Debug print
+                    update_marks_table()
+
+                    student_id_mark_entry.delete(0, tk.END)
+                    course_id_mark_entry.delete(0, tk.END)
+                    mark_entry.delete(0, tk.END)
+                else:
+                    # Print out what is actually in the system for comparison
+                    print("Available course IDs:", list(system.courses.keys()))
+                    print("Available student IDs:", list(system.students.keys()))
+                    print("Invalid course ID or student ID.")
+            except ValueError as e:
+                print(f"Please enter valid numbers for course ID, student ID, and mark. Error: {e}")
+
+        # Bind the Return key to focus to next widget
+        student_id_mark_entry.bind("<Return>", focus_next_widget)
+        course_id_mark_entry.bind("<Return>", focus_next_widget)
+        mark_entry.bind("<Return>", lambda event: add_mark())
+
+        add_mark_button = ttk.Button(marks_input_frame, text="Add Mark", command=add_mark)
+        add_mark_button.grid(row=1, column=7, columnspan=1, pady=5)
+
+        # The Table Frame
+        marks_table_frame = ttk.Frame(marks_tab)
+        marks_table_frame.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True, padx=5, pady=5)
+
+        # Define the table
+        columns = ('student_id',) + tuple(system.courses.keys())
+        marks_table = ttk.Treeview(marks_table_frame, columns=columns, show='headings')
+
+        # Define the columns
+        marks_table.heading('student_id', text='Students')
+        for course_id in system.courses.keys():
+            marks_table.heading(course_id, text=f"{course_id} - {system.courses[course_id].get_name()}")
+
+        # Insert data into the table
+        for student_id, student in system.students.items():
+            row = [f"{student_id} - {student.get_name()}"] + [student.get_marks(course_id) for course_id in system.courses.keys()]
+            marks_table.insert('', tk.END, values=row)
+
+        # Pack the table into the frame
+        marks_table.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        # Scrollbar for the table
+        scrollbar = ttk.Scrollbar(marks_table_frame, orient=tk.VERTICAL, command=marks_table.yview)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        marks_table.configure(yscrollcommand=scrollbar.set)
+
+
 
 
     window = init_gui()
