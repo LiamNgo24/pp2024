@@ -261,12 +261,76 @@ def main():
         add_button.grid(row=4, columnspan=2, pady=5)
 
 
-        # Course Tab
-        ttk.Label(course_tab, text="Course List").pack()
-        course_listbox = tk.Listbox(course_tab)
-        course_listbox.pack(fill=tk.BOTH, expand=True)
+        # # Course Tab
+        # ttk.Label(course_tab, text="Course List").pack()
+        # course_listbox = tk.Listbox(course_tab)
+        # course_listbox.pack(fill=tk.BOTH, expand=True)
+        
+
+        # Course Tab: Organize with two frames, one for input, one for list
+        course_input_frame = ttk.Frame(course_tab)
+        course_input_frame.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
+        
+        # Course input fields in the input frame
+        ttk.Label(course_input_frame, text="Enter course details below:").grid(row=0, columnspan=2)
+
+        ttk.Label(course_input_frame, text="Course ID:").grid(row=1, column=0, sticky=tk.W, padx=5)
+        course_id_entry = ttk.Entry(course_input_frame)
+        course_id_entry.grid(row=1, column=1, sticky=tk.EW, padx=5)
+        
+        ttk.Label(course_input_frame, text="Course Name:").grid(row=2, column=0, sticky=tk.W, padx=5)
+        course_name_entry = ttk.Entry(course_input_frame)
+        course_name_entry.grid(row=2, column=1, sticky=tk.EW, padx=5)
+        
+        # Make the entry widgets expand with the window
+        course_input_frame.columnconfigure(1, weight=1)
+        
+        # List Frame for courses
+        course_list_frame = ttk.Frame(course_tab)
+        course_list_frame.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        ttk.Label(course_list_frame, text="Course List").pack(side=tk.TOP, fill=tk.X)
+        course_listbox = tk.Listbox(course_list_frame)
+        course_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        course_scrollbar = ttk.Scrollbar(course_list_frame, orient='vertical', command=course_listbox.yview)
+        course_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        course_listbox.config(yscrollcommand=course_scrollbar.set)
+        
         for course_id, course in system.courses.items():
             course_listbox.insert(tk.END, f"ID: {course_id}, Name: {course.get_name()}")
+
+        # Function to add a course to the system and list
+        def add_course():
+            # Retrieve the input data
+            course_id = course_id_entry.get()
+            course_name = course_name_entry.get()
+
+            # Simple validation
+            if course_id and course_name:
+                # Assuming course_id should be an integer
+                try:
+                    course_id_int = int(course_id)
+                    system.courses[course_id_int] = Course(course_id_int, course_name)
+                    course_listbox.insert(tk.END, f"ID: {course_id}, Name: {course_name}")
+                    
+                    # Save the data using the system's method
+                    system.save_data()
+                    
+                    # Clear the entry fields
+                    course_id_entry.delete(0, tk.END)
+                    course_name_entry.delete(0, tk.END)
+                    
+                    # Focus back to the first field
+                    course_id_entry.focus_set()
+                except ValueError:
+                    print("Please enter a valid integer for the Course ID.")
+
+        course_id_entry.bind("<Return>", focus_next_widget)
+        course_name_entry.bind("<Return>", lambda event: add_course())
+        
+        # Add button to add course
+        add_course_button = ttk.Button(course_input_frame, text="Add Course", command=add_course)
+        add_course_button.grid(row=3, columnspan=2, pady=5)
 
 
     window = init_gui()
